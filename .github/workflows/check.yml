@@ -1,0 +1,44 @@
+name: check
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Restore workdir
+        id: workdir-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: ./workdir
+          key: workdir-cache
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Check for changes
+        run: pnpm run main
+
+      - name: Save workdir
+        id: workdir-save
+        uses: actions/cache/save@v4
+        with:
+          path: ./workdir
+          key: workdir-cache

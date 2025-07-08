@@ -35,6 +35,13 @@ for await (const filename of await readdir(configdir)) {
 const data = await readFile(new URL(`./data/${latestGameData}`, import.meta.url), "utf-8");
 const subroutines = parseGamedata(data);
 
+const allBrokenSignatures: Array<{
+  name: string;
+  library: string;
+  os: string;
+  signature: string;
+}> = [];
+
 await Promise.all(
   binaries.map(async ({ filename, library, os }) => {
     const filteredSubRoutines = subroutines!.filter((s) => s.library === library);
@@ -54,9 +61,19 @@ await Promise.all(
       brokenSignatures.forEach((subroutine) => {
         const signature = subroutine.signatures[os];
         console.log(`  - ${subroutine.name}: ${signature?.idaStyle}`);
+        allBrokenSignatures.push({ name: subroutine.name, library, os, signature: signature?.idaStyle! });
       });
     } else {
       console.log(`✅ All signatures working!`);
     }
   }),
 );
+
+if (allBrokenSignatures.length > 0) {
+  allBrokenSignatures.forEach(({ name, library, os, signature }) => {
+    console.log(`::error::${name} (${os}/${library}): ${signature}`);
+  });
+  process.exit(1);
+} else {
+  console.log(`\n🎉 All signatures are working correctly!`);
+}

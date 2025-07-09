@@ -3,12 +3,10 @@ import binaries from "./config/binaries.json" assert { type: "json" };
 import { Depot } from "./depot";
 import { exists, workdir } from "./filesystem";
 import { Sigscan } from "./sigscan.js";
-import { Signature, Subroutine } from "./subroutine.js";
 import { Binary } from "./binary.js";
 import { parseGamedata } from "./counterstrikesharp.js";
-import { join } from "node:path";
 import { SteamCmdResponse } from "./steamcmd.js";
-import { sign } from "node:crypto";
+import { join } from "node:path";
 
 if (!(await exists(workdir))) {
   await mkdir(workdir);
@@ -31,6 +29,19 @@ for await (const filename of await readdir(configdir)) {
     await depot.downloadFilesForManifest(manifestId);
   }
 }
+
+const steamInfo = (await readFile(join(workdir, "steam.inf"), "utf-8")).split("\n").reduce(
+  (acc, line) => {
+    const [key, value] = line.trim().split("=");
+    if (key && value) {
+      acc[key] = value;
+    }
+    return acc;
+  },
+  {} as Record<string, string>,
+);
+
+console.log(steamInfo.ServerVersion);
 
 const data = await readFile(new URL(`./data/${latestGameData}`, import.meta.url), "utf-8");
 const subroutines = parseGamedata(data);

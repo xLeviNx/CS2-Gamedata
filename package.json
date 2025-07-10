@@ -9,6 +9,7 @@
     "@ianlucas/cs2-lib": "^5.11.0",
     "@ianlucas/depot-downloader": "^3.0.0",
     "jsonc-parser": "^3.3.1",
+    "picocolors": "^1.1.1",
     "tsx": "^4.20.3"
   },
   "devDependencies": {

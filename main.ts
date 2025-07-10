@@ -6,26 +6,24 @@ import { Sigscan } from "./sigscan.js";
 import { Binary } from "./binary.js";
 import { parseGamedata } from "./counterstrikesharp.js";
 import { SteamCmdResponse } from "./steamcmd.js";
-import { join } from "node:path";
+import { basename, extname, join } from "node:path";
+import colors from "picocolors";
 
 if (!(await exists(workdir))) {
   await mkdir(workdir);
 }
 
 const configdir = new URL("./config", import.meta.url);
-const datadir = new URL("./data", import.meta.url);
 
-const steamData: SteamCmdResponse = await fetch("https://api.steamcmd.net/v1/info/730").then((resp) => resp.json());
-const latestBuildId = steamData.data[730].depots.branches.public.buildid;
-const latestGameData = (await readdir(datadir)).sort().reverse()[0];
+const steamResponse: SteamCmdResponse = await fetch("https://api.steamcmd.net/v1/info/730").then((resp) => resp.json());
+const latestBuildId = steamResponse.data[730].depots.branches.public.buildid;
 
 for await (const filename of await readdir(configdir)) {
   if (filename.endsWith(".depot")) {
-    const depotName = filename.split(".")[0];
+    const depotName = basename(filename, extname(filename));
     const depot = new Depot(parseInt(filename.split(".")[0]));
 
-    var manifestId = steamData.data[730].depots[depotName].manifests.public.gid;
-
+    var manifestId = steamResponse.data[730].depots[depotName].manifests.public.gid;
     await depot.downloadFilesForManifest(manifestId);
   }
 }
@@ -41,18 +39,13 @@ const steamInfo = (await readFile(join(workdir, "steam.inf"), "utf-8")).split("\
   {} as Record<string, string>,
 );
 
-console.log(steamInfo.ServerVersion);
+console.log(colors.gray(`Server Version: ${colors.yellowBright(steamInfo.ServerVersion)}`));
+console.log(colors.gray(`Patch (Build ID): ${colors.yellowBright(latestBuildId)}`));
 
-const data = await readFile(new URL(`./data/${latestGameData}`, import.meta.url), "utf-8");
+const data = await readFile(new URL(`./data/latest.json`, import.meta.url), "utf-8");
 const subroutines = parseGamedata(data);
 
-const allBrokenSignatures: Array<{
-  name: string;
-  library: string;
-  os: string;
-  signature: string;
-}> = [];
-
+let success = true;
 await Promise.all(
   binaries.map(async ({ filename, library, os }) => {
     const filteredSubRoutines = subroutines!.filter((s) => s.library === library);
@@ -68,11 +61,11 @@ await Promise.all(
     });
 
     if (brokenSignatures.length > 0) {
-      console.log(`\n❌ Broken signatures (${brokenSignatures.length}):`);
+      console.log(colors.red(`\n❌ Broken signatures (${brokenSignatures.length}):`));
       brokenSignatures.forEach((subroutine) => {
         const signature = subroutine.signatures[os];
-        console.log(`  - ${subroutine.name}: ${signature?.idaStyle}`);
-        allBrokenSignatures.push({ name: subroutine.name, library, os, signature: signature?.idaStyle! });
+        console.log(`::error::${subroutine.name} (${os}/${library}): ${signature?.idaStyle}`);
+        success = false;
       });
     } else {
       console.log(`✅ All signatures working!`);
@@ -80,10 +73,7 @@ await Promise.all(
   }),
 );
 
-if (allBrokenSignatures.length > 0) {
-  allBrokenSignatures.forEach(({ name, library, os, signature }) => {
-    console.log(`::error::${name} (${os}/${library}): ${signature}`);
-  });
+if (!success) {
   process.exit(1);
 } else {
   console.log(`\n🎉 All signatures are working correctly!`);

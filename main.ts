@@ -43,35 +43,43 @@ console.log(colors.gray(`Server Version: ${colors.yellowBright(steamInfo.ServerV
 console.log(colors.gray(`Patch (Build ID): ${colors.yellowBright(latestBuildId)}`));
 
 const data = await readFile(new URL(`./data/latest.json`, import.meta.url), "utf-8");
-const subroutines = parseGamedata(data);
+const patchData = await readFile(new URL(`./data/${latestBuildId}.json`, import.meta.url), "utf-8").catch(() => null);
 
-let success = true;
-await Promise.all(
-  binaries.map(async ({ filename, library, os }) => {
-    const filteredSubRoutines = subroutines!.filter((s) => s.library === library);
-    const signatures = await Sigscan.findSignatures(new Binary(filename, library, os), filteredSubRoutines);
-    const found = signatures.filter((isFound) => isFound).length;
+const verifyGamedata = async (identifier: string, data: string): Promise<boolean> => {
+  const subroutines = parseGamedata(data);
 
-    console.log(`\n=== ${filename} (${library}) ===`);
-    console.log(`Found ${found} of ${signatures.length} signatures`);
+  console.log(colors.cyanBright(`Verifying gamedata signatures in ${identifier}...`));
 
-    const brokenSignatures = filteredSubRoutines.filter((subroutine) => {
-      const signature = subroutine.signatures[os];
-      return signature?.isSupported && !signature.isFound;
-    });
+  let success = true;
+  await Promise.all(
+    binaries.map(async ({ filename, library, os }) => {
+      const filteredSubRoutines = subroutines!.filter((s) => s.library === library);
+      const signatures = await Sigscan.findSignatures(new Binary(filename, library, os), filteredSubRoutines);
+      const found = signatures.filter((isFound) => isFound).length;
 
-    if (brokenSignatures.length > 0) {
-      console.log(colors.red(`\n❌ Broken signatures (${brokenSignatures.length}):`));
-      brokenSignatures.forEach((subroutine) => {
+      const brokenSignatures = filteredSubRoutines.filter((subroutine) => {
         const signature = subroutine.signatures[os];
-        console.log(`::error::${subroutine.name} (${os}/${library}): ${signature?.idaStyle}`);
-        success = false;
+        return signature?.isSupported && !signature.isFound;
       });
-    } else {
-      console.log(`✅ All signatures working!`);
-    }
-  }),
-);
+
+      if (brokenSignatures.length > 0) {
+        console.log(colors.red(`\n❌ Broken signatures (${brokenSignatures.length}):`));
+        brokenSignatures.forEach((subroutine) => {
+          const signature = subroutine.signatures[os];
+          console.log(`::error::${subroutine.name} (${os}/${library}): ${signature?.idaStyle}`);
+          success = false;
+        });
+      } else {
+        console.log(colors.green(`✅ ${filename} ✅`));
+      }
+    }),
+  );
+
+  return success;
+};
+
+const success =
+  (await verifyGamedata("latest", data)) && (patchData === null || (await verifyGamedata(latestBuildId, patchData)));
 
 if (!success) {
   process.exit(1);

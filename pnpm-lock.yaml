@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@ianlucas/cs2-lib':
-        specifier: ^5.11.0
-        version: 5.11.0
+        specifier: ^7.4.0
+        version: 7.4.0
       '@ianlucas/depot-downloader':
-        specifier: ^3.0.0
-        version: 3.0.0
+        specifier: ^3.4.0
+        version: 3.4.0
       jsonc-parser:
         specifier: ^3.3.1
         version: 3.3.1
@@ -21,17 +21,17 @@ importers:
         specifier: ^1.1.1
         version: 1.1.1
       tsx:
-        specifier: ^4.20.3
-        version: 4.20.3
+        specifier: ^4.20.5
+        version: 4.20.5
     devDependencies:
       '@total-typescript/tsconfig':
         specifier: ^1.0.4
         version: 1.0.4
       '@types/node':
-        specifier: ^22.13.14
-        version: 22.16.0
+        specifier: ^22.18.0
+        version: 22.18.0
       prettier:
-        specifier: ^3.5.3
+        specifier: ^3.6.2
         version: 3.6.2
 
 packages:
@@ -192,17 +192,17 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@ianlucas/cs2-lib@5.11.0':
-    resolution: {integrity: sha512-sGMupdCht0cSxtVZoW/tT5TrEgPyts9AtqgHPAmvXvyaPnE9ZOBPbu88iIIABawksOuZFyVLHBBKHYGptrdK5A==}
+  '@ianlucas/cs2-lib@7.4.0':
+    resolution: {integrity: sha512-VkqgGREcaUOmmrqFxIyFVpSiqmLLuCZm9AVQQoafLsG9l0r5PomIPZafeO55+I7aG6j4IalWgMI1LFW1SiQfjQ==}
 
-  '@ianlucas/depot-downloader@3.0.0':
-    resolution: {integrity: sha512-BO+mx1mxvwRK1AWMDY4Yb3GlPM46IzTepR7gVsA2grNShG2qmAyhAnAd/5KFXKmTDgFo0YbUjYykMY9LgNgvUA==}
+  '@ianlucas/depot-downloader@3.4.0':
+    resolution: {integrity: sha512-zeMTZJXTYkgJQk8UAoq7mrmNzQu1yJCB3gXMDoVOL/qiqZig2GoPjKNypDG3m1e4ch3QxJYHKSxSy9/VDol0YA==}
 
   '@total-typescript/tsconfig@1.0.4':
     resolution: {integrity: sha512-fO4ctMPGz1kOFOQ4RCPBRBfMy3gDn+pegUfrGyUFRMv/Rd0ZM3/SHH3hFCYG4u6bPLG8OlmOGcBLDexvyr3A5w==}
 
-  '@types/node@22.16.0':
-    resolution: {integrity: sha512-B2egV9wALML1JCpv3VQoQ+yesQKAmNMBIAY7OteVrikcOcAkWm+dGL6qpeCktPjAv6N1JLnhbNiqS35UpFyBsQ==}
+  '@types/node@22.18.0':
+    resolution: {integrity: sha512-m5ObIqwsUp6BZzyiy4RdZpzWGub9bqLJMvZDD0QMXhxjqMHMENlj+SqF5QxoUwaQNFe+8kz8XM8ZQhqkQPTgMQ==}
 
   bluebird@3.7.2:
     resolution: {integrity: sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==}
@@ -280,8 +280,8 @@ packages:
   string_decoder@1.1.1:
     resolution: {integrity: sha512-n/ShnvDi6FHbbVfviro+WojiFzv+s8MPMHBczVePfUpDJLwoLT0ht1l4YwBCbi8pJAveEEdnkHyPyTP/mzRfwg==}
 
-  tsx@4.20.3:
-    resolution: {integrity: sha512-qjbnuR9Tr+FJOMBqJCW5ehvIo/buZq7vH7qD7JziU98h6l3qGy0a/yPFjwO+y0/T7GFpNgNAvEcPPVfyT8rrPQ==}
+  tsx@4.20.5:
+    resolution: {integrity: sha512-+wKjMNU9w/EaQayHXb7WA7ZaHY6hN8WgfvHNQ3t1PnU91/7O8TcTnIhCDYTZwnt8JsO9IBqZ30Ln1r7pPF52Aw==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -378,9 +378,9 @@ snapshots:
   '@esbuild/win32-x64@0.25.6':
     optional: true
 
-  '@ianlucas/cs2-lib@5.11.0': {}
+  '@ianlucas/cs2-lib@7.4.0': {}
 
-  '@ianlucas/depot-downloader@3.0.0':
+  '@ianlucas/depot-downloader@3.4.0':
     dependencies:
       follow-redirects: 1.15.9
       unzipper: 0.12.3
@@ -389,7 +389,7 @@ snapshots:
 
   '@total-typescript/tsconfig@1.0.4': {}
 
-  '@types/node@22.16.0':
+  '@types/node@22.18.0':
     dependencies:
       undici-types: 6.21.0
 
@@ -485,7 +485,7 @@ snapshots:
     dependencies:
       safe-buffer: 5.1.2
 
-  tsx@4.20.3:
+  tsx@4.20.5:
     dependencies:
       esbuild: 0.25.6
       get-tsconfig: 4.10.1
